@@ -722,3 +722,31 @@ OpenVPN Protocol
 OpenVPN is currently considered the top form of VPN tunneling protocol. That's because its encryption is especially strong. It's also adept at getting past firewalls.
 SSTP
 Secure Socket Tunneling Protocol is popular due to its full integration with every Microsoft operating system since Windows Vista SP 1. SSTP utilizes 2048-bit SSL/TLS certificates for authentication and 256-bit SSL keys for encryption. The biggest drawback to SSTP is that is basically a Microsoft-developed proprietary protocol and developers do not have access to the underlying code.
+3)))What TCP sockets mean? How to open socket with active/passive host? And
+generally, what is the differences between active and passive sockets
+TCP uses port numbers to distinguish different applications running at the same IP address, and it
+follows exactly the same conventions regarding well-known and ephemeral port numbers.
+Reread the section "Port Numbers" in that chapter if you want to review the details. As you saw in the
+previous chapter, it takes only a single socket to speak UDP: a server can open a UDP port and
+then receive datagrams from thousands of different clients. While it is certainly possible to connect() a
+datagram socket to a particular peer so that the socket will always send() to only that peer and
+recy()packets sent back from that peer, the idea of a connection is just a convenience. The effect of
+connect() is exactly the same as your application simply deciding, on its own, to send to only one
+address with sendto() calls and then ignore responses from any but that same address.
+IP Address + Port Number = Socket
+On the "server side"-which, by definition, is the conversation partner not doing the connect() call but
+receiving the SYN packet that the connect call initiates-an incoming connection generates an even
+more momentous event for a Python application: the creation of a new socket! This is because the
+standard POSIX interface to TCP actually involves two completely different kinds of sockets: "passive"
+listening sockets and active "connected" ones.
+• The passive socket or listening socket maintains the "socket name"-the address and port number-at
+which the server is ready to receive connections. No data can ever be received or sent by this kind of
+socket. It does not represent any actual network conversation. Instead, it is how the server alerts the
+operating system to its willingness to receive incoming connections at a given TCP port number in the
+first place.
+• An active, connected socket is bound to one particular remote conversation partner with a particular
+IP address and port number. It can be used only for talking back and forth with that one partner, and it
+can be read and written to without worrying about how the resulting data will be split up into packets.
+The stream looks so much like a pipe or file that, on Unix systems, a connected TCP socket can be passed
+to another program that expects to read from a normal file, and that program will never even know that
+it is talking over the network. (Ctrl) -   -->
